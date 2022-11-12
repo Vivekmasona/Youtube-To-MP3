@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://kit.fontawesome.com/2fd2b74342.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@700&display=swap" rel="stylesheet">
+    <title>Youtube to MP3 Converter</title>
+</head>
+
+<body>
+    <div class="top__container">
+        <form action="/convert-mp3" method="post" id="form" class="form">
+            <div class="icon">
+                <i class="fa-brands fa-youtube"></i>
+            </div>
+            <h1>Youtube to MP3 Converter</h1>
+            <h4>Enter the Video ID you want to convert</h4>
+            <div class="demo">
+                <div class="demo_image">
+                    <img src="/assets/detail.jpg" alt="Demo Image" />
+                </div>
+                <h5>**This is the video ID</h5>
+            </div>
+            <div>
+                <input type="text" name="videoID" id="" placeholder="Enter video ID">
+                <button id="convertBtn">Convert</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bottom__container">
+        <% if (typeof success !='undefined' && success ) { %>
+            <div class="success">
+                <p>
+                    <%= song_title %>
+                </p>
+                <a href="<%= song_link%>">
+                    <button id="downloadBtn">
+                        Download
+                    </button>
+                </a>
+            </div>
+            <% } else if(typeof success !='undefined' && !success ) { %>
+                <div class="errors">
+                    <p>
+                        <%= message %>
+                    </p>
+                </div>
+                <% } %>
+    </div>
+</body>
+
+</html>
