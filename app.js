@@ -29,7 +29,7 @@ app.post('/convert-mp3', async (req, res) => {
     if (videoID === undefined || videoID === '' || videoID === null) {
         return res.render('index', { success: false, message: 'Please enter a video ID' });
     } else {
-        const fetchAPI = await fetch(`https://youtube-mp36.p.rapidapi.com/dl?id=${videoID}`, {
+        const fetchAPI = await fetch(`https://youtube-mp36.p.rapidapi.com/dl?id=https://youtu.be/${videoID}`, {
             'method': 'GET',
             'headers': {
                 'x-rapidapi-key': process.env.API_KEY,
