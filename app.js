@@ -51,4 +51,3 @@ app.listen(PORT, () => {
     console.log('Server on port 3000')
 });
 
-App.get method ke use se direc download button par redirect kro 
