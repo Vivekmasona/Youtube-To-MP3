@@ -1,53 +1,38 @@
-// required packages
-const express = require('express');
-const fetch = require('node-fetch');
-require('dotenv').config();
+from flask import Flask, request, render_template, send_file
+import yt_dlp
+import requests
+import os
 
-// creating the express server
-const app = express();
+app = Flask(__name)
 
-// server port number
-const PORT = process.env.PORT || 3000;
+@app.route('/download', methods=['GET'])
+def download_video():
+    video_url = request.args.get('url')
 
-// set template engine
-app.set('view engine', 'ejs');
-app.use(express.static("public"));
-app.use('/assets', express.static("public"))
+    if not video_url:
+        return "Please provide a valid video URL."
 
-// needed to parse html data POST request
-app.use(express.urlencoded({
-    extended: true
-}))
-app.use(express.json());
+    try:
+        video_file = download_video_by_url(video_url)
+        return send_file(video_file, as_attachment=True)
+    except Exception as e:
+        return str(e)
 
-app.get('/', (req, res) => {
-    res.render('index');
-})
+def download_video_by_url(url):
+    # You would need to implement logic to identify the platform and handle downloading accordingly.
+    # For simplicity, let's assume we're only dealing with YouTube videos using yt-dlp.
+    if "youtube.com" in url:
+        ydl_opts = {}
+        ydl = yt_dlp.YoutubeDL(ydl_opts)
+        info_dict = ydl.extract_info(url, download=False)
+        video_title = info_dict.get('title', 'video')
+        video_file = video_title + ".mp4"
+        ydl.download([url])
+        return video_file
 
-app.post('/convert-mp3', async (req, res) => {
-    const videoID = req.body.videoID;
-    if (videoID === undefined || videoID === '' || videoID === null) {
-        return res.render('index', { success: false, message: 'Please enter a video ID' });
-    } else {
-        const fetchAPI = await fetch(`https://youtube-mp36.p.rapidapi.com/dl?id=${videoID}`, {
-            'method': 'GET',
-            headers: {
-      'X-RapidAPI-Key': '650590bd0fmshcf4139ece6a3f8ep145d16jsn955dc4e5fc9a',
-      'X-RapidAPI-Host': 'youtube-mp36.p.rapidapi.com'
-    }
-        })
+    raise Exception("Unsupported video platform or invalid URL.")
 
-        const fetchResponse = await fetchAPI.json();
+if __name__ == '__main__':
+    app.run(debug=True)
 
-        if (fetchResponse.status === 'ok')
-            return res.render('index', { success: true, song_title: fetchResponse.title, song_link: fetchResponse.link });
-        else
-            return res.render('index', { success: false, song_title: fetchResponse.title, message: fetchResponse.msg });
-    }
-})
-
-// starting the server
-app.listen(PORT, () => {
-    console.log('Server on port 3000')
-});
 
