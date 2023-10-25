@@ -1,52 +1,32 @@
-// required packages
 const express = require('express');
-const fetch = require('node-fetch');
-require('dotenv').config();
-
-// creating the express server
 const app = express();
+const request = require('request');
 
-// server port number
-const PORT = process.env.PORT || 3000;
+app.get('/Mp3', (req, res) => {
+  // Extract the YouTube link from the 'url' query parameter
+  const ytLink = req.query.url;
 
-// set template engine
-app.set('view engine', 'ejs');
-app.use(express.static("public"));
-app.use('/assets', express.static("public"))
-
-// needed to parse html data POST request
-app.use(express.urlencoded({
-    extended: true
-}))
-app.use(express.json());
-
-app.get('/', (req, res) => {
-    res.render('index');
-})
-
-app.post('/convert-mp3', async (req, res) => {
-    const videoID = req.body.videoID;
-    if (videoID === undefined || videoID === '' || videoID === null) {
-        return res.render('index', { success: false, message: 'Please enter a video ID' });
-    } else {
-        const fetchAPI = await fetch(`https://youtube-mp36.p.rapidapi.com/dl?id=${videoID}`, {
-            'method': 'GET',
-            'headers': {
-                'x-rapidapi-key': process.env.API_KEY,
-                'x-rapidapi-host': process.env.API_HOST
-            }
-        })
-
-        const fetchResponse = await fetchAPI.json();
-
-        if (fetchResponse.status === 'ok')
-            return res.render('index', { success: true, song_title: fetchResponse.title, song_link: fetchResponse.link });
-        else
-            return res.render('index', { success: false, song_title: fetchResponse.title, message: fetchResponse.msg });
+  const options = {
+    method: 'GET',
+    url: 'https://youtube-mp36.p.rapidapi.com/dl',
+    qs: { id: ytLink }, // Use the extracted YouTube link
+    headers: {
+      'X-RapidAPI-Key': '650590bd0fmshcf4139ece6a3f8ep145d16jsn955dc4e5fc9a',
+      'X-RapidAPI-Host': 'youtube-mp36.p.rapidapi.com'
     }
-})
+  };
 
-// starting the server
-app.listen(PORT, () => {
-    console.log('Server on port 3000')
+  request(options, function (error, response, body) {
+    if (error) {
+      res.status(500).send('Error');
+    } else {
+      res.send(body);
+    }
+  });
 });
+
+const PORT = 3000; // You can use any port you prefer
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
